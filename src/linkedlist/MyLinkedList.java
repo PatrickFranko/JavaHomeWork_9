@@ -5,10 +5,11 @@ import java.util.LinkedList;
 public class MyLinkedList <T>{
     private Node<T> firstNode;
     private  Node<T> lastNode;
+    private int size;
 
     public void add(T value){
         if(firstNode == null){
-            firstNode = new Node<>(null, null, value);
+            firstNode = new Node<>(firstNode, lastNode, value);
         }else if(lastNode == null){
             lastNode = new Node<>(firstNode, null, value);
             firstNode.setNextNode(lastNode);
@@ -16,53 +17,68 @@ public class MyLinkedList <T>{
             Node<T> newLastNode = new Node<>(lastNode, null, value);
             lastNode.setNextNode(newLastNode);
             lastNode = newLastNode;
-
         }
-
+        size++;
     }
     public int size(){
-        Node<T> currN = firstNode;
-        int index = 0;
-        while (currN != null){
-            index++;
-            currN=currN.getNextNode();
-        }
-        return index;
+        return size;
     }
     public void remove(int index){
-        Node<T> currentN = firstNode;
 
-        if(index < 0 && index >size()){
-            System.out.println("Wrong index to remove");
+        if(index < 0 || index >= size()){
+            throw new IndexOutOfBoundsException("wrong index");
+        }
+
+        Node<T> currentN;
+        //index більше половини
+        if(size() / 2 < index){
+             currentN = lastNode;
+             for (int i = size() - 1; i > index; i--){
+                 currentN = currentN.getPrevNode();
+             }
         }else {
+            currentN = firstNode;
             for (int i = 0; i < index; i++) {
                 currentN = currentN.getNextNode();
             }
+        }
             Node<T> prev = currentN.getPrevNode();
             Node<T> next = currentN.getNextNode();
             if (prev != null) {
+
                 prev.setNextNode(next);
-                //System.out.println(currentN.getValue() + "|||||");
-            } else if (next != null) {
-                next.setPrevNode(prev);
-                System.out.println("||||");
-            } else if (prev == null) {
-                //System.out.println("88888");
+            } else {
                 firstNode = next;
-            } else if (next == null) {
-                //System.out.println("99999");
+            }
+            if (next != null) {
+                next.setPrevNode(prev);
+            } else {
                 lastNode = prev;
             }
+        size--;
+    }
+    public T get(int index) {
+        Node<T> currentNode;
+        if (index > size() && index < 0) {
+            throw new IndexOutOfBoundsException("wrong index");
         }
 
-    }
-    public T get(int index){
-        Node<T> currentNode = firstNode;
-        for(int i = 0; i<index; i++){
-            currentNode = currentNode.getNextNode();
+        if (size() / 2 < index) {
+            currentNode = lastNode;
+            for (int i = 0; i < size() - 1 - index; i++) {
+                currentNode = currentNode.getPrevNode();
+            }
+            return currentNode.getValue();
         }
+            currentNode = firstNode;
+            for (int i = 0; i < index; i++) {
+                currentNode = currentNode.getNextNode();
+            }
+
         return currentNode.getValue();
     }
+        //return /*currentNode.getValue()*/null;
+    //}
     public void clear(){
         Node<T> currNode = firstNode;
         while (currNode != null){
@@ -73,6 +89,7 @@ public class MyLinkedList <T>{
         }
         firstNode = null;
         lastNode = null;
+        size = 0;
     }
     public static void main(String[] args){
         MyLinkedList<String> ml = new MyLinkedList<>();
@@ -80,15 +97,20 @@ public class MyLinkedList <T>{
         ml.add("Patrick2");
         ml.add("Patrick3");
         ml.add("Patrick4");
+        ml.add("Patrick5");
+        ml.add("Patrick6");
+        ml.add("Patrick7");
+        ml.add("Patrick8");
         System.out.println(ml.get(3));
         System.out.println(ml.get(2));
-        ml.remove(3);
+        //ml.remove(3);
         System.out.println(ml.get(2));
         //System.out.println(ml.get(3)+"//////");
-        ml.size();
-        ml.clear();
+        System.out.println(ml.size()+"2222222222");
+        ml.remove(2);
+        System.out.println(ml.size()+"3333333");
 
-        //ml.get(0);
+        System.out.println(ml.get(2)+"//////+3333333");
         //System.out.println("-----");
         //ml.get(1);
         //System.out.println("000000");

@@ -5,33 +5,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MyHashMap <K, V> {
-    private int hash;
-    private int index;
+    //private int index;
     private Node<K, V>[] table;
     private int size;
-    public static final int DEFAULT_CAPACITY = 10;
+    public static final int DEFAULT_CAPACITY = 16;
+
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
         size = 0;
     }
 
+
     public int size(){
         return size;
     }
-    public void put(K key, V value) {
-//        if (key.equals(key)) {
-//            System.out.println("That key present");
-//        }
+
+
+    public int index(K key){
+        return Math.abs(key.hashCode() % table.length);
+    }
+
+
+    public void put(K key, V value) throws Exception {
         if (key == null) {
-            System.out.println("Enter key");
-        } else {
-            hash = key.hashCode();
-            index = Math.abs(hash % table.length);
+            throw new NullPointerException("key can't be null");
         }
-        Node<K, V> currentNode = table[index];
+        Node<K, V> currentNode = table[index(key)];
         if (currentNode == null) {
-            table[index] = new Node<>(null, value, key, hash);
+            table[index(key)] = new Node<>(null, value, key, hashCode());
             size++;
             return;
         }
@@ -44,17 +46,15 @@ public class MyHashMap <K, V> {
                 prev = currentNode;
                 currentNode = currentNode.getNextNode();
             }
-        prev.setNextNode(new Node<>(null, value, key, hash));
+        prev.setNextNode(new Node<>(null, value, key, hashCode()));
         size++;
-
-        //Map one = new HashMap();
-
     }
+
+
     public V get(K key){
         V v = null;
-        hash = key.hashCode();
-        index = Math.abs(hash % table.length);
-        Node<K,V> current = table[index];
+
+        Node<K,V> current = table[index(key)];
            while( current != null) {
                if (key.equals(current.getKey())) {
                    v = current.getValue();
@@ -63,11 +63,13 @@ public class MyHashMap <K, V> {
            }
         return v;
     }
-    public void clear(){
 
+
+    public void clear(){
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
         size = 0;
     }
+
 
     @Override
     public String toString() {
@@ -85,24 +87,29 @@ public class MyHashMap <K, V> {
         }
         sb.append("}");
         return sb.toString();
-//        return "MyHashMap{" +
-//                "table=" + Arrays.toString(table) +
-//                '}';
     }
+
+
     public void remove(K key){
-        hash = key.hashCode();
-        index = Math.abs(hash % table.length);
-        Node<K,V> current = table[index];
-        while( current != null) {
-            if (key.equals(current.getKey())) {
-                current.setValue(null);
-                current.setKey(null);
+        Node<K,V> nodeForDelet = table[index(key)];
+        Node<K,V> prev = null;
+        while( nodeForDelet != null) {
+            if(key.equals(nodeForDelet.getKey())){
+                if(prev == null) {
+                    table[index(key)] = nodeForDelet.getNextNode();
+                }else {
+                   prev.setNextNode(nodeForDelet.getNextNode());
             }
-            current = current.getNextNode();
+                size--;
+               return;
+            }
+            prev = nodeForDelet;
+            nodeForDelet = nodeForDelet.getNextNode();
         }
     }
 
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws Exception {
         //Map<String, Integer> ms = new HashMap<>();
         MyHashMap<String, Integer> mm = new MyHashMap<>();
         mm.put("rrr", 8);
@@ -120,6 +127,8 @@ public class MyHashMap <K, V> {
         mm.put("qwa", 1);
         mm.put("qws", 2);
         mm.put("qwp", 21);
+        mm.put("wils", 23);
+        mm.put("qwr", 211);
         System.out.println(mm);
         System.out.println(mm.get("qwy"));
         System.out.println(mm.get("qws"));
@@ -128,9 +137,15 @@ public class MyHashMap <K, V> {
 //        System.out.println(mm);
         System.out.println(mm.get("ttt")+ "////");
         System.out.println(mm.get("qwt") + "||||||");
-        //System.out.println(mm);
+        System.out.println(mm);
+        System.out.println(mm.size());
         mm.remove("qwo");
         System.out.println(mm);
+        System.out.println(mm.size());
+        mm.put("", 23);
+        System.out.println(mm);
+        System.out.println(mm.size());
+        mm.remove("");
         mm.clear();
         System.out.println(mm);
 
